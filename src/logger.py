@@ -24,10 +24,7 @@ class Logger(object):
         img_summaries = []
         for i, img in enumerate(images):
             # Write the image to a string
-            try:
-                s = StringIO()
-            except:
-                s = BytesIO()
+            s = BytesIO()
             Image.fromarray(img).save(s, format="png")
 
             # Create an Image object
@@ -53,10 +50,7 @@ class Logger(object):
         img_summaries = []
         for i, vid in enumerate(videos):
             # Concat a video
-            try:
-                s = StringIO()
-            except:
-                s = BytesIO()
+            s = BytesIO()
 
             v = vid.transpose(1, 2, 3, 0)
             v = [np.squeeze(f) for f in np.split(v, v.shape[0], axis=0)]

@@ -56,6 +56,7 @@ import models
 from trainers import Trainer
 
 import data
+import data_new
 
 
 def build_discriminator(type, **kwargs):
@@ -84,8 +85,6 @@ if __name__ == "__main__":
     n_channels = int(args['--n_channels'])
 
     image_transforms = transforms.Compose([
-        PIL.Image.fromarray,
-        transforms.Resize(int(args["--image_size"])),
         transforms.ToTensor(),
         lambda x: x[:n_channels, ::],
         transforms.Normalize((0.5, 0.5, .5), (0.5, 0.5, 0.5)),
@@ -101,8 +100,8 @@ if __name__ == "__main__":
     dim_z_motion = int(args['--dim_z_motion'])
     dim_z_category = int(args['--dim_z_category'])
 
-    dataset = data.VideoFolderDataset(args['<dataset>'], cache=os.path.join(args['<dataset>'], 'local.db'))
-    image_dataset = data.ImageDataset(dataset, image_transforms)
+    dataset = data_new.VideoFolderDataset(args['<dataset>'], cache=os.path.join(args['<dataset>'], 'local.db'))
+    image_dataset = data_new.ImageDataset(dataset, image_transforms)
     image_loader = DataLoader(image_dataset, batch_size=image_batch, drop_last=True, num_workers=2, shuffle=True)
 
     video_dataset = data.VideoDataset(dataset, 16, 2, video_transforms)
