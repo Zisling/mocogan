@@ -78,16 +78,21 @@ def video_transform(video, image_transform):
     return vid
 
 
+n_channels = 7
+def cut_channel(x):
+    return x[:n_channels, ::]
+
 if __name__ == "__main__":
     args = docopt.docopt(__doc__)
     print(args)
 
     n_channels = int(args['--n_channels'])
-
+    mean_tuple = tuple([0.5] * n_channels)
+    std_tuple = tuple([0.5] * n_channels)
     image_transforms = transforms.Compose([
         transforms.ToTensor(),
-        lambda x: x[:n_channels, ::],
-        transforms.Normalize((0.5, 0.5, .5), (0.5, 0.5, 0.5)),
+        cut_channel,
+        transforms.Normalize(mean_tuple, std_tuple),
     ])
 
     video_transforms = functools.partial(video_transform, image_transform=image_transforms)

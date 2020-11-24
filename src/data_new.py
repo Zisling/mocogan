@@ -61,22 +61,11 @@ class ImageDataset(torch.utils.data.Dataset):
 
         video, target = self.dataset[video_id]
 
-        horizontal = video.shape[1] > video.shape[0]
-
-        if horizontal:
-            i_from, i_to = video.shape[0] * frame_num, video.shape[0] * (frame_num + 1)
-            frame = video[:, i_from: i_to, ::]
-        else:
-            i_from, i_to = video.shape[1] * frame_num, video.shape[1] * (frame_num + 1)
-            frame = video[i_from: i_to, :, ::]
-
+        frame = video[frame_num]
         if frame.shape[0] == 0:
-            print(("video {}. From {} to {}. num {}".format(video.shape, i_from, i_to, item)))
+            print(("video {}. num {}".format(video.shape, item)))
 
-        return {"images": self.transforms(frame), "categories": target}
+        return {"images": self.transforms(frame.astype('float32')), "categories": target}
 
     def __len__(self):
         return self.dataset.cumsum[-1]
-
-
-
