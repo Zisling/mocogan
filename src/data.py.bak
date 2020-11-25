@@ -88,6 +88,7 @@ class VideoDataset(torch.utils.data.Dataset):
         self.dataset = dataset
         self.video_length = video_length
         self.every_nth = every_nth
+        tra
         self.transforms = transform if transform is not None else lambda x: x
 
     def __getitem__(self, item):

@@ -69,3 +69,38 @@ class ImageDataset(torch.utils.data.Dataset):
 
     def __len__(self):
         return self.dataset.cumsum[-1]
+
+
+class VideoDataset(torch.utils.data.Dataset):
+    def __init__(self, dataset, video_length, every_nth=1, transform=None):
+        self.dataset = dataset
+        self.video_length = video_length
+        self.every_nth = every_nth
+        self.transforms = transform if transform is not None else lambda x: x
+
+    def __getitem__(self, item):
+        video, target = self.dataset[item]
+
+        video_len = video.shape[0]
+
+        # videos can be of various length, we randomly sample sub-sequences
+        if video_len >= self.video_length * self.every_nth:
+            # TODO: understand why there's a (video_length - 1) here, and also why if we get an invalid every_nth
+            #       we just return the video as is, from the beginning to video_length.
+            needed = self.every_nth * (self.video_length - 1)
+            gap = video_len - needed
+            start = 0 if gap == 0 else np.random.randint(0, gap, 1)[0]
+            subsequence_idx = np.linspace(start, start + needed, self.video_length, endpoint=True, dtype=np.int32)
+        elif video_len >= self.video_length:
+            subsequence_idx = np.arange(0, self.video_length)
+        else:
+            raise Exception("Length is too short id - {}, len - {}").format(self.dataset[item], video_len)
+
+        selected = np.array([video[s_id] for s_id in subsequence_idx])
+
+        return {"images": self.transforms(selected), "categories": target}
+
+    def __len__(self):
+        return len(self.dataset)
+
+# TODO: add the ImageSampler and VideoSampler from data.py, and edit it so it suits our needs
