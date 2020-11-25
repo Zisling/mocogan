@@ -8,7 +8,7 @@ import time
 
 import numpy as np
 
-from logger import Logger
+# from logger import Logger
 
 import torch
 from torch import nn
@@ -221,7 +221,7 @@ class Trainer(object):
             image_discriminator.cuda()
             video_discriminator.cuda()
 
-        logger = Logger(self.log_folder)
+        # logger = Logger(self.log_folder)
 
         # create optimizers
         opt_generator = optim.Adam(generator.parameters(), lr=0.0002, betas=(0.5, 0.999), weight_decay=0.00001)
@@ -271,10 +271,10 @@ class Trainer(object):
                                          sample_fake_image_batch, sample_fake_video_batch,
                                          opt_generator)
 
-            logs['l_gen'] += l_gen.data[0]
+            logs['l_gen'] += l_gen.data
 
-            logs['l_image_dis'] += l_image_dis.data[0]
-            logs['l_video_dis'] += l_video_dis.data[0]
+            logs['l_image_dis'] += l_image_dis.data
+            logs['l_video_dis'] += l_video_dis.data
 
             batch_num += 1
 
@@ -288,19 +288,19 @@ class Trainer(object):
 
                 print(log_string)
 
-                for tag, value in list(logs.items()):
-                    logger.scalar_summary(tag, value / self.log_interval, batch_num)
+                # for tag, value in list(logs.items()):
+                #     logger.scalar_summary(tag, value / self.log_interval, batch_num)
 
                 logs = init_logs()
                 start_time = time.time()
 
                 generator.eval()
 
-                images, _ = sample_fake_image_batch(self.image_batch_size)
-                logger.image_summary("Images", images_to_numpy(images), batch_num)
-
-                videos, _ = sample_fake_video_batch(self.video_batch_size)
-                logger.video_summary("Videos", videos_to_numpy(videos), batch_num)
+                # images, _ = sample_fake_image_batch(self.image_batch_size)
+                # logger.image_summary("Images", images_to_numpy(images), batch_num)
+                #
+                # videos, _ = sample_fake_video_batch(self.video_batch_size)
+                # logger.video_summary("Videos", videos_to_numpy(videos), batch_num)
 
                 torch.save(generator, os.path.join(self.log_folder, 'generator_%05d.pytorch' % batch_num))
 

@@ -65,7 +65,7 @@ class ImageDataset(torch.utils.data.Dataset):
         if frame.shape[0] == 0:
             print(("video {}. num {}".format(video.shape, item)))
 
-        return {"images": self.transforms(frame.astype('float32')), "categories": target}
+        return {"images": self.transforms(frame), "categories": target}
 
     def __len__(self):
         return self.dataset.cumsum[-1]
