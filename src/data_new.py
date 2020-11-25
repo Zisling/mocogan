@@ -38,7 +38,7 @@ class VideoFolderDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, item):
         path, label = self.arrays[item]
-        arr = np.load(path)
+        arr = np.load(path).astype('float32')
         return arr, label
 
     def __len__(self):
@@ -85,18 +85,18 @@ class VideoDataset(torch.utils.data.Dataset):
 
         # videos can be of various length, we randomly sample sub-sequences
         if video_len >= self.video_length * self.every_nth:
-            # TODO: understand why there's a (video_length - 1) here, and also why if we get an invalid every_nth
-            #       we just return the video as is, from the beginning to video_length.
             needed = self.every_nth * (self.video_length - 1)
             gap = video_len - needed
             start = 0 if gap == 0 else np.random.randint(0, gap, 1)[0]
             subsequence_idx = np.linspace(start, start + needed, self.video_length, endpoint=True, dtype=np.int32)
         elif video_len >= self.video_length:
-            subsequence_idx = np.arange(0, self.video_length)
+            raise Exception("Frame skip is too high id - {}, len - {}, frame skip - {}").format(self.dataset[item],
+                                                                                                video_len,
+                                                                                                self.every_nth)
         else:
             raise Exception("Length is too short id - {}, len - {}").format(self.dataset[item], video_len)
 
-        selected = np.array([video[s_id] for s_id in subsequence_idx])
+        selected = video[subsequence_idx]
 
         return {"images": self.transforms(selected), "categories": target}
 

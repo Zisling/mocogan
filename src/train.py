@@ -109,7 +109,8 @@ if __name__ == "__main__":
     image_dataset = data_new.ImageDataset(dataset, image_transforms)
     image_loader = DataLoader(image_dataset, batch_size=image_batch, drop_last=True, num_workers=2, shuffle=True)
 
-    video_dataset = data.VideoDataset(dataset, 16, 2, video_transforms)
+    video_dataset = data_new.VideoDataset(dataset, 16, 2, video_transforms)
+    print(video_dataset[0].shape)
     video_loader = DataLoader(video_dataset, batch_size=video_batch, drop_last=True, num_workers=2, shuffle=True)
 
     generator = models.VideoGenerator(n_channels, dim_z_content, dim_z_category, dim_z_motion, video_length)
