@@ -40,7 +40,9 @@ if __name__ == "__main__":
         video = videos_to_numpy(v).squeeze().transpose((1, 2, 3, 0))
         print(video.shape)
         crate_gif(video[:, :, :, 0:3], os.path.join(out_path, "{}_objs.{}".format(i, "gif")))
-        crate_gif(video[:, :, :, 3:6], os.path.join(out_path, "{}_background.{}".format(i, "gif")))
-        crate_gif(video[:, :, :, 6], os.path.join(out_path, "{}_depth.{}".format(i, "gif")))
+        if video.shape[3] >= 6:
+            crate_gif(video[:, :, :, 3:6], os.path.join(out_path, "{}_background.{}".format(i, "gif")))
+        if video.shape[3] >= 7:
+            crate_gif(video[:, :, :, 6], os.path.join(out_path, "{}_depth.{}".format(i, "gif")))
         print('finished gif no. {}'.format(i))
     print('Finished generation')
