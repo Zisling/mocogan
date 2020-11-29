@@ -305,7 +305,6 @@ class Trainer(object):
                 # log videos
                 vid_obj = videos[:, 0:3, :, :, :].permute(0, 2, 1, 3, 4)
                 vid_background = videos[:, 3:6, :, :, :].permute(0, 2, 1, 3, 4)
-                print(vid_obj.shape)
                 self.writer.add_video("video_obj", vid_obj, batch_num, fps=35)
                 self.writer.add_video("video_background", vid_background, batch_num, fps=35)
 
