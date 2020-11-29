@@ -8,11 +8,10 @@ import time
 
 import numpy as np
 
-# from logger import Logger
 
 import torch
 from torch import nn
-
+from torch.utils.tensorboard import SummaryWriter
 from torch.autograd import Variable
 import torch.optim as optim
 
@@ -69,6 +68,8 @@ class Trainer(object):
         self.image_enumerator = None
         self.video_enumerator = None
 
+        self.writer = SummaryWriter(self.log_folder)
+
     @staticmethod
     def ones_like(tensor, val=1.):
         return Variable(T.FloatTensor(tensor.size()).fill_(val), requires_grad=False)
@@ -104,7 +105,6 @@ class Trainer(object):
         # l_vidoes + l_images -> l
         # l.backward()
         # opt.step()
-
 
         #  sample again and compute for generator
 
@@ -221,7 +221,6 @@ class Trainer(object):
             image_discriminator.cuda()
             video_discriminator.cuda()
 
-        # logger = Logger(self.log_folder)
 
         # create optimizers
         opt_generator = optim.Adam(generator.parameters(), lr=0.0002, betas=(0.5, 0.999), weight_decay=0.00001)
@@ -288,19 +287,27 @@ class Trainer(object):
 
                 print(log_string)
 
-                # for tag, value in list(logs.items()):
-                #     logger.scalar_summary(tag, value / self.log_interval, batch_num)
+                # log loss
+                for tag, value in list(logs.items()):
+                    self.writer.add_scalar(tag, value / self.log_interval, batch_num)
 
                 logs = init_logs()
                 start_time = time.time()
 
                 generator.eval()
 
-                # images, _ = sample_fake_image_batch(self.image_batch_size)
-                # logger.image_summary("Images", images_to_numpy(images), batch_num)
-                #
-                # videos, _ = sample_fake_video_batch(self.video_batch_size)
-                # logger.video_summary("Videos", videos_to_numpy(videos), batch_num)
+                images, _ = sample_fake_image_batch(self.image_batch_size)
+                # log images
+                self.writer.add_images('images-objs', images[:, 0:3, :, :], batch_num)
+                self.writer.add_images('images-background', images[:, 3:6, :, :], batch_num)
+
+                videos, _ = sample_fake_video_batch(self.video_batch_size)
+                # log videos
+                vid_obj = videos[:, 0:3, :, :, :].permute(0, 2, 1, 3, 4)
+                vid_background = videos[:, 3:6, :, :, :].permute(0, 2, 1, 3, 4)
+                print(vid_obj.shape)
+                self.writer.add_video("video_obj", vid_obj, batch_num, fps=35)
+                self.writer.add_video("video_background", vid_background, batch_num, fps=35)
 
                 torch.save(generator, os.path.join(self.log_folder, 'generator_%05d.pytorch' % batch_num))
 
